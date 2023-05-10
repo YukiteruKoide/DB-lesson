@@ -236,12 +236,63 @@ SELECT COUNT(id) FROM tests_score;
 SELECT * FROM tests_score;
 
 -- scoreカラムの追加
+ALTER TABLE tests_score ADD score INT;
 
+-- scoreに数値を入れるロジック
+SELECT *,
+	CASE
+		WHEN COALESCE(test_score_1,test_score_2,test_score_3) >= 900 THEN FLOOR(COALESCE(test_score_1,test_score_2,test_score_3)*1.2)
+		WHEN COALESCE(test_score_1,test_score_2,test_score_3) <= 600 THEN CEILING(COALESCE(test_score_1,test_score_2,test_score_3)*0.8)
+	ELSE COALESCE(test_score_1,test_score_2,test_score_3)
+	END 
+FROM tests_score;
+	
+-- 実際にアップデートの実施
+UPDATE tests_score SET score = CASE
+		WHEN COALESCE(test_score_1,test_score_2,test_score_3) >= 900 THEN FLOOR(COALESCE(test_score_1,test_score_2,test_score_3)*1.2)
+		WHEN COALESCE(test_score_1,test_score_2,test_score_3) <= 600 THEN CEILING(COALESCE(test_score_1,test_score_2,test_score_3)*0.8)
+	ELSE COALESCE(test_score_1,test_score_2,test_score_3)
+	END;
 
-
-
+-- 内容の確認
+SELECT * FROM tests_score;
 
 
 /*
 13. employeesテーブルを、 departmentが、マーケティング部 、研究部、開発部、総務部、営業部、経理部の順になるように並び替えて表示してください。
 */
+
+-- テーブルの定義確認
+DESCRIBE employees;
+
+-- テーブルの行数確認
+SELECT COUNT(id) FROM employees;
+
+-- テーブルのサンプル表示
+SELECT * FROM employees LIMIT 10;
+
+-- ロジックの検討
+/*
+ * １：マーケティング部 
+ * ２：研究部
+ * ３：開発部
+ * ４：総務部
+ * ５：営業部
+ * ６：経理部 
+ */
+
+SELECT *,
+	CASE 
+		WHEN department = "マーケティング部" THEN 1
+		WHEN department = "研究部" THEN 2
+		WHEN department = "開発部" THEN 3
+		WHEN department = "総務部" THEN 4
+		WHEN department = "営業部" THEN 5	
+		WHEN department = "経理部" THEN 6
+	END AS department_No
+FROM employees
+ORDER BY department_No;
+
+
+
+
